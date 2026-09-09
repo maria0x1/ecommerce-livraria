@@ -7,6 +7,9 @@ import br.unitins.tp1.service.LivroService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -33,21 +36,38 @@ public class LivroResource {
     }
 
     @GET
-    @Path("/buscar/livro/{titulo}")
+    @Path("/buscar/titulo/{titulo}")
     public List<Livro> buscarPorTitulo(@PathParam("titulo") String titulo) {
         return livroService.findByTitulo(titulo);
     }
 
     @GET
-    @Path("/buscar/livro/{autor}")
+    @Path("/buscar/autor/{autor}")
     public List<Livro> buscarPorAutor(@PathParam("autor") String autor) {
         return livroService.findByAutor(autor);
     }
 
     @GET
-    @Path("/buscar/livro/{editora}")
+    @Path("/buscar/editora/{editora}")
     public List<Livro> buscarPorEditora(@PathParam("editora") String editora) {
         return livroService.findByEditora(editora);
+    }
+
+    @POST
+    public Livro inserir(Livro livro) {
+        return livroService.create(livro);
+    } 
+
+    @PUT
+    @Path("atualizar/{id}")
+    public void atualizar(@PathParam("id") Long id, Livro livro) {
+       livroService.update(id, livro);
+    } 
+
+    @DELETE
+    @Path("deletar/{id}")
+    public void excluir(@PathParam("id") Long id) {
+        livroService.delete(id);
     }
 
 }
