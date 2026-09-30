@@ -2,15 +2,17 @@ package br.unitins.tp1.service;
 
 import java.util.List;
 
+import br.unitins.tp1.dto.*;
 import br.unitins.tp1.model.Livro;
+import jakarta.validation.Valid;
 
 public interface LivroService {
-    Livro create(Livro livro);
-    void update(Long id, Livro livro);
+    LivroDTOResponse create(@Valid Livro livro);
+    LivroDTOResponse update(Long id,@Valid Livro livro);
     void delete(Long id);
-    Livro findByID(Long id);
-    List<Livro> findByTitulo(String titulo);
-    List<Livro> findByAutor(String autor);
-    List<Livro> findByEditora(String editora);
-    List<Livro> findAll();
+    LivroDTOResponse findByID(Long id);
+    List<LivroDTOResponse> findAll();
+    List<LivroDTOResponse> findByTitulo(String titulo);
+    List<LivroDTOResponse> findByAutor(String autor);   
+    List<LivroDTOResponse> findByEditora(String editora);
 }

@@ -1,13 +1,17 @@
 package br.unitins.tp1.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Livro extends DefaultEntity {
     
     private String titulo;
     private String autor;
-    private String editora;
+    @ManyToOne
+    @JoinColumn (name = "id_editora")
+    private Editora editora;
     
     public String getTitulo() {
         return titulo;
@@ -21,10 +25,10 @@ public class Livro extends DefaultEntity {
     public void setAutor(String autor) {
         this.autor = autor;
     }
-    public String getEditora() {
+    public Editora getEditora() {
         return editora;
     }
-    public void setEditora(String editora) {
+    public void setEditora(Editora editora) {
         this.editora = editora;
     }
     

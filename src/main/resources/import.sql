@@ -5,6 +5,8 @@
 -- insert into myentity (id, field) values(3, 'field-3');
 -- alter sequence myentity_seq restart with 4;
 
-INSERT INTO livro (titulo, autor, editora) VALUES ('Clean Code', 'Robert C. Martin', 'Alta Books');
-INSERT INTO livro (titulo, autor, editora) VALUES ('O Programador Pragmático', 'Andrew Hunt', 'Bookman');
-INSERT INTO livro (titulo, autor, editora) VALUES ('Domain-Driven Design', 'Eric Evans', 'Alta Books');
+INSERT INTO editora (nome, cnpj) VALUES ('Alta Books', '11111111000100');
+INSERT INTO editora (nome, cnpj) VALUES ('Bookman', '22222222000100');
+
+INSERT INTO livro (titulo, autor, id_editora) VALUES ('Clean Code', 'Robert C. Martin', 1);
+INSERT INTO livro (titulo, autor, id_editora) VALUES ('O Programador Pragmático', 'Andrew Hunt', 2);
