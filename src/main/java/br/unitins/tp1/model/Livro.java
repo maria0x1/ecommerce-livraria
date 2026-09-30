@@ -1,11 +1,14 @@
 package br.unitins.tp1.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Livro extends DefaultEntity {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Livro extends DefaultEntity {
     
     private String titulo;
     private String autor;
