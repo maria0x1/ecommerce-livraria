@@ -27,6 +27,28 @@ Be aware that it’s not an _über-jar_ as the dependencies are copied into the 
 
 The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
 
+## Error responses
+
+API errors use the `application/problem+json` media type and follow RFC 9457. The response includes `type`, `title`, `status`, `detail`, and `instance`. Validation failures also include a `violations` array with the invalid `field` and its `message`, for example:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Erro de validação",
+  "status": 400,
+  "detail": "Um ou mais campos da requisição são inválidos.",
+  "instance": "/livros/digitais",
+  "violations": [
+    {
+      "field": "inserir.dto.titulo",
+      "message": "O campo titulo é obrigatório"
+    }
+  ]
+}
+```
+
+Validation errors, malformed requests (`BadRequestException`), and missing resources (`NotFoundException`) are converted centrally by JAX-RS exception mappers. Missing book IDs in read, update, and delete operations are reported as `404 Not Found`.
+
 If you want to build an _über-jar_, execute the following command:
 
 ```shell script

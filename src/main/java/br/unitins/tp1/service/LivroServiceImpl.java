@@ -7,6 +7,7 @@ import br.unitins.tp1.repository.LivroRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
 public class LivroServiceImpl implements LivroService {
@@ -17,12 +18,17 @@ public class LivroServiceImpl implements LivroService {
     @Override
     @Transactional
     public void delete(Long id) {
-        livroRepository.deleteById(id);
+        if (!livroRepository.deleteById(id)) {
+            throw new NotFoundException();
+        }
     }
 
     @Override
     public LivroResponseDTO findByID(Long id) {
         Livro livro = livroRepository.findById(id);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
         return LivroResponseDTO.fromEntity(livro);
     }
 

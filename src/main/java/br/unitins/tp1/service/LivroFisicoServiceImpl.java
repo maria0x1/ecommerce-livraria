@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
 public class LivroFisicoServiceImpl implements LivroFisicoService {
@@ -34,7 +35,7 @@ public class LivroFisicoServiceImpl implements LivroFisicoService {
     public LivroFisicoResponseDTO update(Long id, @Valid LivroFisicoDTO dto) {
         LivroFisico livro = livroFisicoRepository.findById(id);
         if (livro == null) {
-            return null;
+            throw new NotFoundException();
         }
 
         preencher(livro, dto);
@@ -44,13 +45,18 @@ public class LivroFisicoServiceImpl implements LivroFisicoService {
     @Override
     public LivroFisicoResponseDTO findById(Long id) {
         LivroFisico livro = livroFisicoRepository.findById(id);
-        return livro == null ? null : LivroFisicoResponseDTO.fromEntity(livro);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
+        return LivroFisicoResponseDTO.fromEntity(livro);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        livroFisicoRepository.deleteById(id);
+        if (!livroFisicoRepository.deleteById(id)) {
+            throw new NotFoundException();
+        }
     }
 
     private void preencher(LivroFisico livro, LivroFisicoDTO dto) {

@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
 public class LivroDigitalServiceImpl implements LivroDigitalService {
@@ -34,7 +35,7 @@ public class LivroDigitalServiceImpl implements LivroDigitalService {
     public LivroDigitalResponseDTO update(Long id, @Valid LivroDigitalDTO dto) {
         LivroDigital livro = livroDigitalRepository.findById(id);
         if (livro == null) {
-            return null;
+            throw new NotFoundException();
         }
 
         preencher(livro, dto);
@@ -44,13 +45,18 @@ public class LivroDigitalServiceImpl implements LivroDigitalService {
     @Override
     public LivroDigitalResponseDTO findById(Long id) {
         LivroDigital livro = livroDigitalRepository.findById(id);
-        return livro == null ? null : LivroDigitalResponseDTO.fromEntity(livro);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
+        return LivroDigitalResponseDTO.fromEntity(livro);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        livroDigitalRepository.deleteById(id);
+        if (!livroDigitalRepository.deleteById(id)) {
+            throw new NotFoundException();
+        }
     }
 
     private void preencher(LivroDigital livro, LivroDigitalDTO dto) {
