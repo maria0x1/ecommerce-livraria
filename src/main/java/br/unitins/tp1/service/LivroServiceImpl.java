@@ -24,6 +24,7 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
+    @Transactional
     public LivroResponseDTO findByID(Long id) {
         Livro livro = livroRepository.findById(id);
         if (livro == null) {
@@ -33,6 +34,7 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
+    @Transactional
     public List<LivroResponseDTO> findAll() {
         return livroRepository.listAll()
                 .stream()
@@ -41,6 +43,7 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
+    @Transactional
     public List<LivroResponseDTO> findByTitulo(String titulo) {
         return livroRepository.find("UPPER(titulo) LIKE ?1", "%" + titulo.toUpperCase() + "%")
                 .list()
@@ -50,6 +53,7 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
+    @Transactional
     public List<LivroResponseDTO> findByAutor(String autor) {
         return livroRepository.find("UPPER(autor) LIKE ?1", "%" + autor.toUpperCase() + "%")
                 .list()
@@ -59,6 +63,7 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
+    @Transactional
     public List<LivroResponseDTO> findByEditora(String editora) {
         return livroRepository.findByEditora(editora)
                 .stream()

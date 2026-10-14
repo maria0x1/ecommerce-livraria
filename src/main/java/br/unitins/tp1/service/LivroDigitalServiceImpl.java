@@ -2,10 +2,9 @@ package br.unitins.tp1.service;
 
 import br.unitins.tp1.dto.LivroDigitalDTO;
 import br.unitins.tp1.dto.LivroDigitalResponseDTO;
-import br.unitins.tp1.model.Editora;
 import br.unitins.tp1.model.LivroDigital;
-import br.unitins.tp1.repository.EditoraRepository;
 import br.unitins.tp1.repository.LivroDigitalRepository;
+import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -19,7 +18,7 @@ public class LivroDigitalServiceImpl implements LivroDigitalService {
     LivroDigitalRepository livroDigitalRepository;
 
     @Inject
-    EditoraRepository editoraRepository;
+    LivroSupportService livroSupportService;
 
     @Override
     @Transactional
@@ -43,6 +42,7 @@ public class LivroDigitalServiceImpl implements LivroDigitalService {
     }
 
     @Override
+    @Transactional
     public LivroDigitalResponseDTO findById(Long id) {
         LivroDigital livro = livroDigitalRepository.findById(id);
         if (livro == null) {
@@ -53,19 +53,41 @@ public class LivroDigitalServiceImpl implements LivroDigitalService {
 
     @Override
     @Transactional
+    public List<LivroDigitalResponseDTO> findAll() {
+        return livroDigitalRepository.listAll().stream()
+                .map(LivroDigitalResponseDTO::fromEntity)
+                .toList();
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id) {
         if (!livroDigitalRepository.deleteById(id)) {
             throw new NotFoundException();
         }
     }
 
-    private void preencher(LivroDigital livro, LivroDigitalDTO dto) {
-        livro.setTitulo(dto.titulo());
-        livro.setAutor(dto.autor());
-        livro.setFormato(dto.formato());
-        livro.setTamanhoArquivo(dto.tamanhoArquivo());
+    @Override
+    @Transactional
+    public LivroDigitalResponseDTO aplicarDesconto(Long id, Double percentual) {
+        LivroDigital livro = livroDigitalRepository.findById(id);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
+        try {
+            livro.aplicarDesconto(percentual);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw new jakarta.ws.rs.BadRequestException(exception.getMessage(), exception);
+        }
+        return LivroDigitalResponseDTO.fromEntity(livro);
+    }
 
-        Editora editora = editoraRepository.findById(dto.idEditora());
-        livro.setEditora(editora);
+    private void preencher(LivroDigital livro, LivroDigitalDTO dto) {
+        livroSupportService.preencherDadosComuns(
+                livro, dto.titulo(), dto.autor(), dto.isbn(), dto.preco(), dto.dataPublicacao(),
+                dto.idEditora(), dto.idsCategorias());
+        livro.setFormatoArquivo(dto.formatoArquivo());
+        livro.setTamanhoMb(dto.tamanhoMb());
+        livro.setLicencaDrm(dto.licencaDrm());
     }
 }

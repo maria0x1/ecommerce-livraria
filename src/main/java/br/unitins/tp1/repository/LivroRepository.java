@@ -17,6 +17,6 @@ public class LivroRepository implements PanacheRepository<Livro>{
     }
 
     public List<Livro> findByEditora(String editora){
-        return find("upper(editora) like ?1", "%" + editora.toUpperCase() + "%").list();    
+        return find("upper(editora.nome) like ?1", "%" + editora.toUpperCase() + "%").list();
     }
 }

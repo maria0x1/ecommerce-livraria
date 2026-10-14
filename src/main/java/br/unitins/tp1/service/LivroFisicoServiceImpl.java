@@ -2,10 +2,10 @@ package br.unitins.tp1.service;
 
 import br.unitins.tp1.dto.LivroFisicoDTO;
 import br.unitins.tp1.dto.LivroFisicoResponseDTO;
-import br.unitins.tp1.model.Editora;
 import br.unitins.tp1.model.LivroFisico;
-import br.unitins.tp1.repository.EditoraRepository;
 import br.unitins.tp1.repository.LivroFisicoRepository;
+import java.util.List;
+import jakarta.persistence.LockModeType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -19,7 +19,7 @@ public class LivroFisicoServiceImpl implements LivroFisicoService {
     LivroFisicoRepository livroFisicoRepository;
 
     @Inject
-    EditoraRepository editoraRepository;
+    LivroSupportService livroSupportService;
 
     @Override
     @Transactional
@@ -43,6 +43,7 @@ public class LivroFisicoServiceImpl implements LivroFisicoService {
     }
 
     @Override
+    @Transactional
     public LivroFisicoResponseDTO findById(Long id) {
         LivroFisico livro = livroFisicoRepository.findById(id);
         if (livro == null) {
@@ -53,19 +54,56 @@ public class LivroFisicoServiceImpl implements LivroFisicoService {
 
     @Override
     @Transactional
+    public List<LivroFisicoResponseDTO> findAll() {
+        return livroFisicoRepository.listAll().stream()
+                .map(LivroFisicoResponseDTO::fromEntity)
+                .toList();
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id) {
         if (!livroFisicoRepository.deleteById(id)) {
             throw new NotFoundException();
         }
     }
 
-    private void preencher(LivroFisico livro, LivroFisicoDTO dto) {
-        livro.setTitulo(dto.titulo());
-        livro.setAutor(dto.autor());
-        livro.setPeso(dto.peso());
-        livro.setEstoqueDisponivel(dto.estoqueDisponivel());
+    @Override
+    @Transactional
+    public LivroFisicoResponseDTO baixarEstoque(Long id, Integer quantidade) {
+        LivroFisico livro = livroFisicoRepository.findById(id, LockModeType.PESSIMISTIC_WRITE);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
+        try {
+            livro.baixarEstoque(quantidade);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw new jakarta.ws.rs.BadRequestException(exception.getMessage(), exception);
+        }
+        return LivroFisicoResponseDTO.fromEntity(livro);
+    }
 
-        Editora editora = editoraRepository.findById(dto.idEditora());
-        livro.setEditora(editora);
+    @Override
+    @Transactional
+    public LivroFisicoResponseDTO aplicarDesconto(Long id, Double percentual) {
+        LivroFisico livro = livroFisicoRepository.findById(id);
+        if (livro == null) {
+            throw new NotFoundException();
+        }
+        try {
+            livro.aplicarDesconto(percentual);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw new jakarta.ws.rs.BadRequestException(exception.getMessage(), exception);
+        }
+        return LivroFisicoResponseDTO.fromEntity(livro);
+    }
+
+    private void preencher(LivroFisico livro, LivroFisicoDTO dto) {
+        livroSupportService.preencherDadosComuns(
+                livro, dto.titulo(), dto.autor(), dto.isbn(), dto.preco(), dto.dataPublicacao(),
+                dto.idEditora(), dto.idsCategorias());
+        livro.setPesoKg(dto.pesoKg());
+        livro.setQuantidadeEstoque(dto.quantidadeEstoque());
+        livro.setTipoCapa(dto.tipoCapa());
     }
 }
