@@ -12,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("/livros")
 @Produces(MediaType.APPLICATION_JSON)
@@ -53,8 +54,9 @@ public class LivroResource {
 
     @DELETE
     @Path("deletar/{id}")
-    public void excluir(@PathParam("id") Long id) {
+    public Response excluir(@PathParam("id") Long id) {
         livroService.delete(id);
+        return Response.ok().build();
     }
 
 }

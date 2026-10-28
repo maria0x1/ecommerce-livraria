@@ -15,11 +15,16 @@ public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestExce
 
     @Override
     public Response toResponse(BadRequestException exception) {
+        String detail = exception.getMessage();
+        if (detail == null || detail.isBlank()) {
+            detail = "A requisição não pôde ser processada.";
+        }
+
         return ProblemDetailsFactory.response(
                 uriInfo,
                 Response.Status.BAD_REQUEST.getStatusCode(),
                 "Requisição inválida",
-                "A requisição não pôde ser processada.",
+                detail,
                 null);
     }
 }

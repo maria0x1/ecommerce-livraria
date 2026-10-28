@@ -15,7 +15,10 @@ class LivroDomainTest {
         livro.aplicarDesconto(12.5);
 
         assertEquals(87.49, livro.getPreco());
-        assertThrows(IllegalArgumentException.class, () -> livro.aplicarDesconto(101.0));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> livro.aplicarDesconto(101.0));
+        assertEquals("O percentual de desconto deve estar entre 0 e 100.", exception.getMessage());
     }
 
     @Test
@@ -26,7 +29,14 @@ class LivroDomainTest {
         livro.baixarEstoque(3);
 
         assertEquals(1, livro.getQuantidadeEstoque());
-        assertThrows(IllegalStateException.class, () -> livro.baixarEstoque(2));
-        assertThrows(IllegalArgumentException.class, () -> livro.baixarEstoque(0));
+        IllegalStateException stockException = assertThrows(
+                IllegalStateException.class,
+                () -> livro.baixarEstoque(2));
+        assertEquals("Estoque insuficiente.", stockException.getMessage());
+
+        IllegalArgumentException quantityException = assertThrows(
+                IllegalArgumentException.class,
+                () -> livro.baixarEstoque(0));
+        assertEquals("A quantidade a baixar deve ser positiva.", quantityException.getMessage());
     }
 }
